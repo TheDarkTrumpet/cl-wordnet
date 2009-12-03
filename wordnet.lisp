@@ -82,6 +82,8 @@
 (clsql:locally-enable-sql-reader-syntax)
 
 ;;;;;; Our helper functions ;;;;;;;
+(defgeneric query-wordnet (wordnet)
+  (:documentation "Our generic function that'll query wordnet"))
 
 (define-condition query-error (error)
   ((text :initarg :text :reader text)))
