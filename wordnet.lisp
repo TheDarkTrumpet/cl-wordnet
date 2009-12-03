@@ -74,5 +74,49 @@
    (definition :accessor definition :type (string 9000) :initarg :definition))
   (:base-table synonyms))
 
+;;;;;; ENABLE SYNTAX READER ;;;;;;;
+; Note, ran into some issues with this at times, run:
+; (clsql:locally-disable-sql-reader-syntax) to disable syntax, then again to reenable
+;
+(clsql:locally-disable-sql-reader-syntax)
+(clsql:locally-enable-sql-reader-syntax)
 
+;;;;;; Our helper functions ;;;;;;;
+
+(define-condition query-error (error)
+  ((text :initarg :text :reader text)))
+
+(defun query-db (&key (word nil) (tbl nil) (srcword 'lemma) (db *mssql*)
+		 (order-by nil))
+  (if (or (null word) (null tbl))
+      (error 'query-error :text "Must supply a word and table minimum")
+      (if (not order-by)
+	  (clsql:select tbl
+			:where [= srcword word]
+			:order-by order-by
+			:database db)
+	  (clsql:select tbl
+			:where [= srcword word]
+			:database db))))
+	  
+(defun list-word-defs (word)
+  (dolist (obj (query-db :word word :tbl 'worddef)) 
+    (format t "Definition: ~a~%" (slot-value (first obj) 'definition))))
+
+(defun list-word-parse (word)
+  (dolist (obj (query-db :word word :tbl 'wordparse))
+    (format t "parse output: ~a~%" (slot-value (first obj) 'parse))))
+
+(defun list-word-hypernyms (word)
+  (dolist (obj (query-db :word word :tbl 'hypernyms :srcword 'hyponym :order-by 'hypernym))
+    (format t "Hypernym: ~a~%" (slot-value (first obj) 'hypernym))))
+
+(defun list-word-hyponyms (word)
+  (dolist (obj (query-db :word word :tbl 'hyponyms :srcword 'hypernym :order-by 'hyponym))
+    (format t "Hyponym: ~a~%" (slot-value (first obj) 'hyponym))))
+
+(defun list-word-synonyms (word)
+  (dolist (obj (query-db :word word :tbl 'synonyms :srcword 'orig_word))
+    (format t "Synonym: ~a, grammar position: ~a~%" (slot-value (first obj) 'synonym)
+	    (slot-value (first obj) 'grammarpos))))
 
