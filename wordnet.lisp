@@ -14,7 +14,20 @@
 	 (require :clsql-sqlite3)))
 
 (defpackage :wordnet
-  (:use :cl :cl-odbc :cl-sqlite3))
+  (:use :cl :clsql-odbc :clsql-sqlite3)
+  (:export :connect-wordnet-mssql
+	   ))
 
 (in-package :wordnet)
+
+(defun connect-wordnet-mssql ()
+  (setf *mssql* (clsql:connect '("wordnet" "wordnet" "wordnet") 
+			       :database-type :odbc
+			       :make-default t)))
+
+(defun connect-wordnet-sqlite ()
+  (setf *sqlite* (clsql:connect '("/tmp/test.sqlite3") 
+				:database-type :sqlite3
+				:make-default nil)))
+
 
