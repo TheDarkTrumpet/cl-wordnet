@@ -9,11 +9,6 @@
 ; to join up the tables as needed.
 ;
 ;
-(defpackage :wordnet
-  (:use :cl :clsql-odbc :clsql-sqlite3)
-  (:export :connect-wordnet-mssql
-	   ))
-
 (in-package :wordnet)
 
 ;;;; Disable caching, mostly for debugging at this point ;;;;
