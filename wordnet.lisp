@@ -9,10 +9,6 @@
 ; to join up the tables as needed.
 ;
 ;
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (progn (require :clsql-odbc)
-	 (require :clsql-sqlite3)))
-
 (defpackage :wordnet
   (:use :cl :clsql-odbc :clsql-sqlite3)
   (:export :connect-wordnet-mssql
@@ -32,8 +28,8 @@
 			       :database-type :odbc
 			       :make-default t)))
 
-(defun connect-wordnet-sqlite ()
-  (setf *sqlite* (clsql:connect '("/tmp/test.sqlite3") 
+(defun connect-wordnet-sqlite (path)
+  (setf *sqlite* (clsql:connect (list path)
 				:database-type :sqlite3
 				:make-default nil)))
 
@@ -82,6 +78,9 @@
 (clsql:locally-enable-sql-reader-syntax)
 
 ;;;;;; Our helper functions ;;;;;;;
+(defun flatten-results (rlist)
+  (mapcar #'first rlist))
+
 (defgeneric query-wordnet (wordnet)
   (:documentation "Our generic function that'll query wordnet"))
 
@@ -96,14 +95,16 @@
 	  (clsql:select tbl
 			:where [= srcword word]
 			:order-by order-by
-			:database db)
+			:database db
+			:flatp t)
 	  (clsql:select tbl
 			:where [= srcword word]
-			:database db))))
+			:database db
+			:flatp t))))
 	  
 (defun list-word-defs (word)
   (dolist (obj (query-db :word word :tbl 'worddef)) 
-    (format t "Definition: ~a~%" (slot-value (first obj) 'definition))))
+    (format t "Definition: ~a~%" (slot-value obj 'definition))))
 
 (defun list-word-parse (word)
   (dolist (obj (query-db :word word :tbl 'wordparse))
