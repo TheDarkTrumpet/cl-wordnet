@@ -14,7 +14,6 @@
 ;;;; Disable caching, mostly for debugging at this point ;;;;
 (setf clsql:*cache-table-queries-default* nil)
 
-;;;; Setup wordnet database global objects ;;;;
 (defvar *mssql* nil)
 (defvar *sqlite* nil)
 
