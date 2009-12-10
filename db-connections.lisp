@@ -35,24 +35,25 @@
 
 ;; Connection method for MSSQL
 (defmethod connect-db ((db db-connection-mssql) &optional make-default)
-  (clsql:connect (list 
-		  (host-name db)
-		  (user-name db)
-		  (password db))
-		 :database-type :odbc
-		 :make-default make-default))
+  (connect (list 
+	    (host-name db)
+	    (user-name db)
+	    (password db))
+	   :database-type :odbc
+	   :make-default make-default))
 
 (defmethod connect-db ((db db-connection-sqlite) &optional make-default)
-  (clsql:connect (list 
-		  (path db))
-		 :database-type :sqlite3)
-		 :make-default make-default)
+  (connect (list 
+	    (path db))
+	   :database-type :sqlite3)
+  :make-default make-default)
 
 ; If you close a database multiple times with clsql, you get an error
 ; The purpose of this is, really do I care if the person closes the database more than
 ; once? I think not...
+; database-state from the clsql-sys package
 
 (defun disconnect-db (db)
-  (when (eql (clsql-sys:database-state db) :open)
-    (clsql:disconnect :database db))
+  (when (eql (database-state db) :open)
+    (disconnect :database db))
   T)

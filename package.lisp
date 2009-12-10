@@ -2,6 +2,8 @@
 
 (defpackage :wordnet
   (:use :cl :clsql-odbc :clsql-sqlite3)
+  (:import-from :clsql-sys :database-state)
+  (:import-from :clsql :def-view-class :disconnect :connect)
   (:export :connect-wordnet-mssql
 	   :with-generic-wordnet-mssql-connection
 	   :db-connection-mssql
