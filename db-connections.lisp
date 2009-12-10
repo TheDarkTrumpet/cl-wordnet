@@ -11,8 +11,9 @@
   (:documentation "The foundation datbase connection class, that the others will inherit"))
 
 (defclass db-connection-sqlite (db-connection)
-  ((type :initform "sqlite" :reader db-type))
-  (:documentation "The specific connection object for SQLite")
+  ((type :initform "sqlite3" :reader db-type)
+   (path :initarg :path :accessor path))
+  (:documentation "The specific connection object for SQLite"))
 
 (defclass db-connection-dbms (db-connection)
   ((host :initarg :host :accessor host-name)
@@ -39,5 +40,11 @@
 		  (user-name db)
 		  (password db))
 		 :database-type :odbc
+		 :make-default make-default))
+
+(defmethod connect-db ((db db-connection-sqlite) &optional make-default)
+  (clsql:connect (list 
+		  (path db))
+		 :database-type :sqlite3)
 		 :make-default make-default))
   
