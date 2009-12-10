@@ -22,5 +22,5 @@
 
 (defclass db-connection-mssql (db-connection-dbms)
   ((type :initform "odbc" :reader db-type))
-  (:documentation "The specific MSSQL database")
+  (:documentation "The specific MSSQL database"))
 
