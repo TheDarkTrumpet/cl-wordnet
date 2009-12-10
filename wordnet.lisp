@@ -14,21 +14,6 @@
 ;;;; Disable caching, mostly for debugging at this point ;;;;
 (setf clsql:*cache-table-queries-default* nil)
 
-(defvar *mssql* nil)
-(defvar *sqlite* nil)
-
-(defun connect-wordnet-mssql ()
-  (setf *mssql* (clsql:connect '("wordnet" "wordnet" "wordnet") 
-			       :database-type :odbc
-			       :make-default t)))
-
-(defun connect-wordnet-sqlite (path)
-  (setf *sqlite* (clsql:connect (list path)
-				:database-type :sqlite3
-				:make-default nil)))
-
-
-
 ;;;;;; ENABLE SYNTAX READER ;;;;;;;
 ; Note, ran into some issues with this at times, run:
 ; (clsql:locally-disable-sql-reader-syntax) to disable syntax, then again to reenable
@@ -36,9 +21,10 @@
 (clsql:locally-disable-sql-reader-syntax)
 (clsql:locally-enable-sql-reader-syntax)
 
-;;;;;; Our helper functions ;;;;;;;
-(defun flatten-results (rlist)
-  (mapcar #'first rlist))
+(defmacro with-generic-wordnet-mssql-connection ((var) &body body)
+  `(let ((,var (connect-db (make-instance 'db-connection-mssql :user "wordnet" :host "wordnet" :pass "wordnet"))))
+     ,@body
+     (disconnect-db ,var)))
 
 (defgeneric query-wordnet (wordnet)
   (:documentation "Our generic function that'll query wordnet"))
@@ -48,7 +34,7 @@
 
 (defun query-db (&key (word nil) (tbl nil) (srcword 'lemma) (db *mssql*)
 		 (order-by nil))
-  (if (or (null word) (null tbl))
+  (if (or (null word) (null tbl) (null db))
       (error 'query-error :text "Must supply a word and table minimum")
       (if (not order-by)
 	  (clsql:select tbl
@@ -60,25 +46,33 @@
 			:where [= srcword word]
 			:database db
 			:flatp t))))
-	  
+
 (defun list-word-defs (word)
-  (dolist (obj (query-db :word word :tbl 'worddef)) 
-    (format t "Definition: ~a~%" (slot-value obj 'definition))))
+  (with-generic-wordnet-mssql-connection (dbms)
+    (dolist (obj (query-db :word word :tbl 'worddef :db dbms))
+      (format t "Definition: ~a~%" (definition obj)))))
 
 (defun list-word-parse (word)
-  (dolist (obj (query-db :word word :tbl 'wordparse))
-    (format t "parse output: ~a~%" (slot-value (first obj) 'parse))))
+  (with-generic-wordnet-mssql-connection (dbms)
+    (dolist (obj (query-db :word word :tbl 'wordparse :db dbms))
+      (format t "parse output: ~a~%" (parse obj)))))
 
 (defun list-word-hypernyms (word)
-  (dolist (obj (query-db :word word :tbl 'hypernyms :srcword 'hyponym :order-by 'hypernym))
-    (format t "Hypernym: ~a~%" (slot-value (first obj) 'hypernym))))
+  (with-generic-wordnet-mssql-connection (dbms)
+    (dolist (obj (query-db :word word :tbl 'hypernyms :srcword 'hyponym :order-by 'hypernym :db dbms))
+      (format t "Hypernym: ~a~%" (hypernym obj)))))
 
 (defun list-word-hyponyms (word)
-  (dolist (obj (query-db :word word :tbl 'hyponyms :srcword 'hypernym :order-by 'hyponym))
-    (format t "Hyponym: ~a~%" (slot-value (first obj) 'hyponym))))
+  (with-generic-wordnet-mssql-connection (dbms)
+    (dolist (obj (query-db :word word :tbl 'hyponyms :srcword 'hypernym :order-by 'hyponym :db dbms))
+      (format t "Hyponym: ~a~%" (hyponym obj)))))
 
 (defun list-word-synonyms (word)
-  (dolist (obj (query-db :word word :tbl 'synonyms :srcword 'orig_word))
-    (format t "Synonym: ~a, grammar position: ~a~%" (slot-value (first obj) 'synonym)
-	    (slot-value (first obj) 'grammarpos))))
+  (with-generic-wordnet-mssql-connection (dbms)
+    (dolist (obj (query-db :word word :tbl 'synonyms :srcword 'orig_word :db dbms))
+      (format t "Synonym: ~a, grammar position: ~a~%" (synonym obj) (grammarpos obj)))))
+
+
+
+
 

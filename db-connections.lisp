@@ -46,5 +46,13 @@
   (clsql:connect (list 
 		  (path db))
 		 :database-type :sqlite3)
-		 :make-default make-default))
-  
+		 :make-default make-default)
+
+; If you close a database multiple times with clsql, you get an error
+; The purpose of this is, really do I care if the person closes the database more than
+; once? I think not...
+
+(defun disconnect-db (db)
+  (when (eql (clsql-sys:database-state db) :open)
+    (clsql:disconnect :database db))
+  T)

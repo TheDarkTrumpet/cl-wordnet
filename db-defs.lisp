@@ -31,8 +31,8 @@
 
 (clsql:def-view-class synonyms ()
   ((orig_word :accessor orig_word :type (string 80) :initarg :orig_word)
-   (synonym :accessor orig_word :type (string 80) :initarg :orig_word)
-   (pos :accessor pos :type integer :initarg :pos)
+   (synonym :accessor synonym :type (string 80) :initarg :synonym)
+   (pos :accessor pos :type (string 5) :initarg :pos)
    (grammarpos :accessor grammarpos :type (string 15) :initarg  :grammarpos)
    (definition :accessor definition :type (string 9000) :initarg :definition))
   (:base-table synonyms))
