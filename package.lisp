@@ -19,4 +19,16 @@
 	   :db-connection-dbms
 	   :db-connection-mssql
 	   :connect-db
-	   :disconnect-db))
+	   :disconnect-db
+	   :lemma
+	   :pos
+	   :definition
+	   :synsetid
+	   :parse
+	   :hyponym
+	   :rank
+	   :hypernym
+	   :orig_word
+	   :synonym
+	   :grammarpos
+	   :definition))

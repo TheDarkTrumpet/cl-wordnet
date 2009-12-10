@@ -1,6 +1,9 @@
 ; wordnet-example
 ; Examples of how to use the library
 
+(defpackage :wordnet-examples
+  (:use :cl :wordnet))
+
 (in-package :wordnet-examples)
 
 (defun list-word-defs (word)
