@@ -45,8 +45,8 @@
 (defmethod connect-db ((db db-connection-sqlite) &optional make-default)
   (connect (list 
 	    (path db))
-	   :database-type :sqlite3)
-  :make-default make-default)
+	   :database-type :sqlite3
+	   :make-default make-default))
 
 ; If you close a database multiple times with clsql, you get an error
 ; The purpose of this is, really do I care if the person closes the database more than
