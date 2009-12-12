@@ -19,4 +19,6 @@
 (defun build-sqlite-db ()
   (with-generic-wordnet-mssql-connection (dbms)
     (with-generic-wordnet-sqlite-connection (sqlitedb)
-      )))
+;      (clsql:create-view-from-class 'worddef :database sqlitedb)
+      (dolist (obj (query-db :word "cat" :tbl 'worddef :db dbms))
+	(clsql:update-records-from-instance obj :database sqlitedb)))))
