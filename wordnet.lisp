@@ -26,6 +26,11 @@
      ,@body
      (disconnect-db ,var)))
 
+(defmacro with-generic-wordnet-sqlite-connection ((var) &body body)
+  `(let ((,var (connect-db (make-instance 'db-connection-sqlite :path "db/wordnet.sqlite3"))))
+     ,@body
+     (disconnect-db ,var)))
+
 ; Do I need this method?
 (defgeneric query-wordnet (wordnet)
   (:documentation "Our generic function that'll query wordnet"))

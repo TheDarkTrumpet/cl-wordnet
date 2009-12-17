@@ -6,6 +6,7 @@
   (:import-from :clsql :def-view-class :disconnect :connect)
   (:export :connect-wordnet-mssql
 	   :with-generic-wordnet-mssql-connection
+	   :with-generic-wordnet-sqlite-connection
 	   :db-connection-mssql
 	   :query-db
 	   :query-error
