@@ -18,3 +18,4 @@
       (dolist (obj (query-db :word "cat" :tbl 'worddef :db dbms))
 	(setf (slot-value obj (intern "VIEW-DATABASE" 'clsql-sys)) nil)
 	(clsql:update-records-from-instance obj :database sqlitedb)))))
+
